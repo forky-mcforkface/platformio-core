@@ -132,6 +132,10 @@ class SerialPortFinder:
         return None
 
     def find(self, initial_port=None):
+        import time
+
+        print("Start device finder", time.time())
+
         if initial_port:
             if not is_pattern_port(initial_port):
                 return initial_port
@@ -143,8 +147,10 @@ class SerialPortFinder:
         device = None
         if self.board_config and self.board_config.get("build.hwids", []):
             device = self._find_board_device()
+        print("Using board config", time.time(), device)
         if not device:
             device = self._find_known_device()
+        print("Using knowing PID/VIDs", time.time(), device)
         if device:
             port = self._reveal_device_port(device)
 
@@ -156,6 +162,8 @@ class SerialPortFinder:
             port = item["port"]
             if "VID:PID" in item["hwid"]:
                 best_port = port
+        print("Find any UART device", time.time(), best_port or port)
+        print("")
         return best_port or port
 
     def _reveal_device_port(self, device):
